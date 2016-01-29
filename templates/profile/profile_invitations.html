@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% load humanize %}
+
+
+{% block content %}
+
+<h4> List of invitations sent/received</h4>
+
+{% if invitation_list %}
+	{% for invite in invitations_list %}
+		<ul>
+		{% if invite in sent %}
+			<p> You've sent invite for <a href="{% url 'profile' slug=invite.invitee %}"> {{ invite.invitee }}</a> to moderate <a href="{% url 'jaryanak_detail' pk=invite.jaryanak.id slug=invite.jaryanak.slug %}"> {{invite.jaryanak}}</a> | {{ invite.created_at|naturaltime}} | <b>Status:</b> {{ invite.get_status_display }}
+			{% if invite.status == 0 %}
+
+			<form method="POST" value="expire" action="{% url 'invite_accept_moderator' key=invite.key decision="expire" %}">
+				{% csrf_token %}
+				<button type="submit"> Expire </button>
+			</form>
+			{% endif %}
+
+			</p>
+
+		{% else %}
+			<p> You've been invited by <a href="{% url 'profile' slug=invite.inviter %}"> {{ invite.inviter }}</a> to moderate <a href="{% url 'jaryanak_detail' pk=invite.jaryanak.id slug=invite.jaryanak.slug %}"> {{invite.jaryanak}}</a> | {{ invite.created_at|naturaltime}} | <b>Status:</b> {{ invite.get_status_display }}
+			{% if invite.status == 0 %}
+				<form method="POST" value="accept" action="{% url 'invite_accept_moderator' key=invite.key decision="accept" %}">
+					{% csrf_token %}
+					<button type="submit"> Accept </button>
+				</form>
+				<form method="POST" value="accept" action="{% url 'invite_accept_moderator' key=invite.key decision="reject" %}">
+					{% csrf_token %}
+					<button type="submit"> Reject </button>
+				</form>
+			{% endif %}
+				</p>
+		{% endif %}
+		</ul>
+	{% endfor %}
+{% else %}
+	<p> Nothing to show! </p>
+{% endif %}
+
+{% endblock%}

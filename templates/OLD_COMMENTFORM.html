@@ -1,0 +1,21 @@
+{# {% load comments %}
+{% load humanize %}
+
+
+{% get_comment_list for links.link object.pk as comment_list %}
+{% if comment_list %}
+  <h2>Comments</h2>
+  {% for comment in comment_list %}
+    <h4>{{ comment.name|escape }} at {{ comment.submit_date|naturaltime}}</h4>
+    <p>{{ comment.comment|escape|urlizetrunc:"100"|linebreaks }}</p>
+  {% endfor %}
+{% endif %}
+{% if request.user.is_authenticated %}
+  <h2>Leave a comment</h2>
+  {% render_comment_form for links.link object.pk %}
+{% else %}
+    <p>Please <a href="{% url 'login' %}">log in</a> to leave a comment.</p>
+{% endif %}
+
+ #}
+ 

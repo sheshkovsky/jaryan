@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+{% load humanize %}
+{% load comments_tags %}
+
+
+{% block content%}
+
+<ul>
+{% for object in object_list %}
+	<li> 
+	<a href="{% url 'jaryanak_detail' pk=object.pk slug=object.slug %}"><img src="{{ MEDIA_URL }}{{ object.logo.url_50x50 }}"> <h3>{{ object.name }}</h3></a>
+	<p> {{ object.description }}</p>
+	
+	<p> ___________ </p>
+	</li>
+{% endfor %}
+</ul>
+
+{% endblock %}

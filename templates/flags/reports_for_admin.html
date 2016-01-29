@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% load humanize %}
+
+{% block content%}
+<style>
+th, td {
+    padding: 10px;
+}
+</style>
+<table style="text-align:center;">
+	<tr>
+		<th> ID </th>
+		<th> Title </th>
+		<th> Jaryan </th>
+		<th> Poster </th>		
+		<th> Flagger </th>
+		<th> Date </th>
+		<th> Status </th>
+	</tr>
+{% if request.user.is_superuser %}
+
+{% for report in object_list %}
+	{% with report.object as object %}
+	<tr>
+		<td>{{ report.id }}</td>
+
+		{% if object.url %}
+			<td><a href="{% url 'link_detail' pk=object.pk slug=object.slug%}">{{ object.title }}</a></td>
+		{% else %}
+			<td><a href="{% url 'text_detail' pk=object.pk slug=object.slug%}">{{ object.title }}</a></td>
+		{% endif %}
+		<td><a href="{% url 'jaryanak_detail' pk=object.jaryanak.id slug=object.jaryanak.slug %}">{{ object.jaryanak.name }}</a></td>
+		<td><a href="{% url 'profile' slug=object.submitter %}">{{ object.submitter }}</a></td>		
+		<td><a href="{% url 'profile' slug=report.reporter %}">{{ report.reporter }}</a></td>		
+		<td>{{ report.submit_date|naturaltime }}</td>
+		<td>{{ report.get_status_display }}</td>
+		{% if report.status == 0%}
+			<td>
+			<li><a href="{% url 'report_action' pk=report.id action="1"%}">Ban 1 day</a></li>
+			<li><a href="{% url 'report_action' pk=report.id action="2"%}">Ban 3 days</a></li>
+			<li><a href="{% url 'report_action' pk=report.id action="3"%}">Ban 10 days</a></li>
+			<li><a href="{% url 'report_action' pk=report.id action="4"%}">Ban Forever</a></li>
+			<li><a href="{% url 'report_action' pk=report.id action="5"%}">Unpublish Post</a></li>
+			<li><a href="{% url 'report_action' pk=report.id action="6"%}">No Action Needed</a></li>
+			<li><a href="{% url 'report_action' pk=report.id action="7"%}"> Deactive User </a></li>
+			</td>	
+		{% endif %}
+	</tr>
+	{% endwith %}
+{% endfor %}
+</table>
+
+{% else %}
+<p> Go home, You shouldn't be here!</p>
+
+{% endif %}
+
+{% endblock %}

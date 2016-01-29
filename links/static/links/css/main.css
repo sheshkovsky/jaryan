@@ -1,0 +1,12 @@
+label[for=id_honeypot],
+#id_honeypot {
+  display: none;
+}
+
+#cancel_reply {
+    display: none;
+}
+
+.comments #cancel_reply {
+  display: inline;
+}

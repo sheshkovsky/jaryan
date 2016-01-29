@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+{% load humanize %}
+
+{% load comments_tags %}
+{% load flags_tags %}
+{% load votes_tags%}
+
+{% block javascript %}
+    <script type="text/javascript" src="{% static 'links/js/reply.js' %}"></script>
+    <script type="text/javascript" src="{% static 'links/js/vote.js' %}"></script>
+    <script type="text/javascript" src="{% static 'links/js/flag.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+{% if messages %}
+  <ul class="messages">
+      {% for message in messages %}
+      <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+      {% endfor %}
+  </ul>
+{% endif %}
+
+<h2><a href="{{ link.url }}">{{ link.title }}</a></h2>
+  <div id="vote">{% include 'votes/vote_form.html' %}</div>
+
+<div class="desc">
+  {{ object.description }}
+
+  	<br>
+    <p>
+      Submitted by: <a href="{% url 'profile' slug=link.submitter %}">
+      <img src="{{ MEDIA_URL }}{{ link.submitter.userprofile.picture.url_15x15 }} ">
+      {{ link.submitter }}</a> 
+      at: {{ link.submit_date | naturaltime }} |
+      {% if link.favicon %}
+        <img src="{{ link.favicon }}" width="20" height="20">
+      {% endif %}
+      Domain: {{ link.domain }} |
+      Jaryanak: <a href="{% url 'jaryanak_detail' pk=link.jaryanak.pk slug=link.jaryanak.slug %}">{{ link.jaryanak.name }}</a> |
+      {% if not link.language.slug = "farsi" %}
+        language: {{ link.language }}
+      {% endif %}
+    </p>
+	<br>
+</div>
+
+{%if user.is_authenticated %}
+  {% if object.submitter == user or object.jaryanak in moderate_by_current_user %}
+    <a href="{% url 'link_update' pk=object.pk %}">Edit</a> | 
+    <a href="{% url 'link_delete' pk=object.pk %}">Delete</a> |
+  {% endif %}
+      <a href="#" id="show-report">Report</a>
+      <a href="#" id="hide-report">Hide Report</a>
+      <div id="report">{% include 'flags/report_form.html' %}</div>
+{% endif %}
+
+
+{% get_comment_list for object as comment_list %}
+{% if request.user.is_authenticated %}
+    <div class="comments_wrapper" id="comments">
+        <div class="comments_length">
+            <p>{{ comment_list|length }} Comments</p>
+        </div>
+
+        <div class="comments">
+            {% for comment in comment_list|fill_tree|annotate_tree %}{% ifchanged comment.parent_id %}{% else %}</li>{% endifchanged %}{% if not comment.open and not comment.close %}</li>{% endif %}{% if comment.open %}
+                <ul>{% endif %}
+            <li class="comment_li" id="c{{ comment.id }}">{# c## is used by the absolute URL of the Comment model, so keep that as it is. #}
+                <div class="comment">
+                    <div class="comment_info">
+                        <div class="comment_user"><a href="{% url 'profile' slug=comment.user_name %}">{{ comment.user_name }}</a></div>
+                        <div class="comment_data">
+                            {{ comment.submit_date| naturaltime }}
+                          | <a href="#c{{ comment.id }}" data-comment-id="{{ comment.id }}" class="comment_reply_link">Reply</a>
+                        </div>
+                    </div>
+                    <div class="comment_text">
+                        {{ comment.comment }}
+                    </div>
+
+                    {% with comment|content_type as ctype %}
+                      <form class="vote" method="POST" action="{% url 'vote' %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="content_type" value="{{ ctype.id }}" />
+                        <input type="hidden" name="object_id" value="{{ comment.id }}" />
+                        <input type="hidden" name="vote" value="+1"/>
+                        <input type="submit" value="+" />
+                      </form>
+
+                      <div>
+                        {% score_for_object comment as score %} 
+                        <p class="{{ ctype.id }}-{{ comment.pk }}">{{ score.score }}</p>
+                      </div>
+
+                      <form class="vote" method="POST" action="{% url 'vote' %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="content_type" value="{{ ctype.id }}" />
+                        <input type="hidden" name="object_id" value="{{ comment.id }}" />
+                        <input type="hidden" name="vote" value="-1"/>
+                        <input type="submit" value="-" />
+                      </form>
+                    {% endwith %}
+
+
+                </div>
+                {% for close in comment.close %}</li></ul>{% endfor %}
+
+            {% endfor %}
+        </div>
+
+        <div id="wrap_write_comment">
+            <div id="form-comment">
+                {% get_comment_form for object as form %}
+                <form action="/comments/post/" method="post">{% csrf_token %}
+                    {{ form.as_p }}{# just to keep the example simple. Consider using django-crispy-forms in real life #}
+
+                    <p>
+                      <input type="submit" value="Submit Comment"/>
+                      <a href="#c0" id="cancel_reply">cancel reply</a>
+                    </p>
+                </form>
+            </div>
+        </div>
+    </div>
+{% else %}
+  please <a href="{% url 'login' %}">login</a> to submit new comment.
+{% endif %}
+
+{% endblock %}

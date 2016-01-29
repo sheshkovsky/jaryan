@@ -1,0 +1,24 @@
+{% load votes_tags %}
+
+{% with object|content_type as ctype %}
+  <form class="vote" method="POST" action="{% url 'vote' %}">
+    {% csrf_token %}
+    <input type="hidden" name="content_type" value="{{ ctype.id }}" />
+    <input type="hidden" name="object_id" value="{{ object.id }}" />
+    <input type="hidden" name="vote" value="+1"/>
+    <input type="submit" value="+" />
+  </form>
+
+  <div>
+    {% score_for_object object as score %} 
+    <p class="{{ ctype.id }}-{{ object.pk }}">{{ score.score }}</p>
+  </div>
+  
+  <form class="vote" method="POST" action="{% url 'vote' %}">
+    {% csrf_token %}
+    <input type="hidden" name="content_type" value="{{ ctype.id }}" />
+    <input type="hidden" name="object_id" value="{{ object.id }}" />
+    <input type="hidden" name="vote" value="-1"/>
+    <input type="submit" value="-" />
+  </form>
+{% endwith %}

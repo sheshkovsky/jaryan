@@ -1,0 +1,2 @@
+{% load i18n %}
+{% blocktrans with invite.inviter.username as username %}Invitation from {{ username }} to join {{ invite.jaryanak }} {% endblocktrans %}

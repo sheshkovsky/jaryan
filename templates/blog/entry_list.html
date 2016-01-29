@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% load django_markdown %}
+
+{% block content %}
+
+{% for object in object_list %}
+	<div class="post">
+		<a href="{% url 'blog_detail' year=object.created|date:"Y" month=object.created|date:"m" day=object.created|date:"d" slug=object.slug %}"><h2>{{ object.title }}</h2></a>
+		<p class="meta">{{ object.created }}</p>
+		{{ object.body|markdown }}
+	</div>
+{% endfor %}
+
+{% endblock %}

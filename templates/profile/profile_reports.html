@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% load humanize %}
+
+
+{% block content %}
+
+<h4> List of all reports</h4>
+{% if reports %}
+
+{% for report in reports %}
+	{{ report.object.pk }}
+{% endfor %}
+
+{% else %}
+	<p> Nothing to show! </p>
+{% endif %}
+
+{% endblock%}

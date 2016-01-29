@@ -1,0 +1,159 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+{% load humanize %}
+
+{% load comments_tags %}
+{% load votes_tags%}
+
+{% block content%}
+
+{% if messages %}
+<ul class="messages">
+    {% for message in messages %}
+    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
+
+<div id="section">
+<ul>
+{% for post in object_list %}
+{% if not post.is_nsfw %}
+	{% if post.is_link %}
+		{% with post.content_object as link%}
+		{% if link.jaryanak in followed_jaryanaks %}
+		{% get_comment_count for link as comment_count %}
+
+		<li>
+			<a href="{{ link.url }}"><h3>{{ link.title }}</h3></a>
+
+			{% with link|content_type as ctype %}
+			  <form class="vote" method="POST" action="{% url 'vote' %}">
+			    {% csrf_token %}
+			    <input type="hidden" name="content_type" value="{{ ctype.id }}" />
+			    <input type="hidden" name="object_id" value="{{ link.id }}" />
+			    <input type="hidden" name="vote" value="+1"/>
+			    <input type="submit" value="+" />
+			  </form>
+
+			  <div>
+			    {% score_for_object link as score %} 
+			    <p class="{{ ctype.id }}-{{ link.pk }}">{{ score.score }}</p>
+			  </div>
+			  
+			  <form class="vote" method="POST" action="{% url 'vote' %}">
+			    {% csrf_token %}
+			    <input type="hidden" name="content_type" value="{{ ctype.id }}" />
+			    <input type="hidden" name="object_id" value="{{ link.id }}" />
+			    <input type="hidden" name="vote" value="-1"/>
+			    <input type="submit" value="-" />
+			  </form>
+			{% endwith %}
+
+			
+			<a href="{% url 'link_detail' pk=link.id slug=link.slug %}">
+				{% if comment_count > 0 %} {{ comment_count }} Comments {% else %} Discuss {% endif %}
+			</a>
+			<p> 
+				Submitted by: <a href="{% url 'profile' slug=link.submitter %}">
+				{% if link.submitter.userprofile.picture %}
+		  			<img src="{{ MEDIA_URL }}{{ link.submitter.userprofile.picture.url_15x15 }}"></img><b> {{ link.submitter}}</b></a>
+				{% else %}
+		 			<img src="../../media/images/profile_pictures/default.15x15.jpg"></img><b> {{ link.submitter }}</b></a>
+				 	{% endif %}
+
+				at: {{ link.submit_date | naturaltime }} |
+				{% if link.favicon %}
+					<img src="{{ link.favicon }}" width="20" height="20">
+				{% endif %}
+				Domain: {{ link.domain }} |
+				Jarynak: <a href="{% url 'jaryanak_detail' pk=link.jaryanak.pk slug=link.jaryanak.slug %}">{{ link.jaryanak.name }}</a>
+				{% if not link.language.slug = "farsi" %}
+					| language: {{ link.language }}
+				{% endif %}
+			</p>
+		</li>
+		{% endif %}
+		{% endwith %}
+
+	{% elif post.is_text %}
+
+		{% with post.content_object as text%}
+		{% if text.jaryanak in followed_jaryanaks %}
+		{% get_comment_count for text as comment_count %}
+
+
+		<li>
+			<a href="{% url 'text_detail' pk=text.pk slug=text.slug %}"><h3>{{ text.title }}</h3></a>
+
+			{% with text|content_type as ctype %}
+			  <form class="vote" method="POST" action="{% url 'vote' %}">
+			    {% csrf_token %}
+			    <input type="hidden" name="content_type" value="{{ ctype.id }}" />
+			    <input type="hidden" name="object_id" value="{{ text.id }}" />
+			    <input type="hidden" name="vote" value="+1"/>
+			    <input type="submit" value="+" />
+			  </form>
+
+			  <div>
+			    {% score_for_object text as score %} 
+			    <p class="{{ ctype.id }}-{{ text.pk }}">{{ score.score }}</p>
+			  </div>
+			  
+			  <form class="vote" method="POST" action="{% url 'vote' %}">
+			    {% csrf_token %}
+			    <input type="hidden" name="content_type" value="{{ ctype.id }}" />
+			    <input type="hidden" name="object_id" value="{{ text.id }}" />
+			    <input type="hidden" name="vote" value="-1"/>
+			    <input type="submit" value="-" />
+			  </form>
+			{% endwith %}
+
+			
+			<a href="{% url 'text_detail' pk=text.id slug=text.slug %}">
+				{% if comment_count > 0 %} {{ comment_count }} Comments {% else %} Discuss {% endif %}
+			</a>
+			<p> 
+				Submitted by: <a href="{% url 'profile' slug=text.submitter %}">
+				{% if text.submitter.userprofile.picture %}
+		  			<img src="{{ MEDIA_URL }}{{ text.submitter.userprofile.picture.url_15x15 }}"></img><b> {{ text.submitter}}</b></a>
+				{% else %}
+		 			<img src="../../media/images/profile_pictures/default.15x15.jpg"></img><b> {{ text.submitter }}</b></a>
+				 	{% endif %}
+				"text-logo"
+				at: {{ text.submit_date | naturaltime }} |
+				{% if text.favicon %}
+					<img src="{{ text.favicon }}" width="20" height="20">
+				{% endif %}
+				Jarynak: <a href="{% url 'jaryanak_detail' pk=text.jaryanak.pk slug=text.jaryanak.slug %}">{{ text.jaryanak.name }}</a>
+				{% if not text.language.slug = "farsi" %}
+					| language: {{ text.language }}
+				{% endif %}
+			</p>
+		</li>
+		{% endif %}
+		{% endwith %}
+
+	{% endif %}
+{% endif %}
+{% endfor %}
+</ul>
+</div>
+
+<div id="nav">
+<h3>Search</h3>
+{% csrf_token %}
+<input type="text" id="search" name="search"/>
+
+<ul id="search-results">
+	{% include "ajax_search.html" %}
+</ul>
+
+</div>
+{% endblock %}
+
+{% block javascript %}
+    <script type="text/javascript" src="{% static 'links/js/vote.js' %}"></script>
+    <script type="text/javascript" src="{% static 'links/js/search.js' %}"></script>
+{% endblock %}
+

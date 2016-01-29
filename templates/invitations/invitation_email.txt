@@ -1,0 +1,8 @@
+{% load i18n %}
+{% blocktrans with invite.inviter.username as username %}You have been invited by {{ username }} to join {{ invite.jaryanaks }}!{% endblocktrans %}
+
+{% trans "Go to" %}
+http://
+{% trans "to join!" %}
+
+all the best

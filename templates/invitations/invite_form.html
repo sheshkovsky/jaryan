@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% load i18n %}
+
+{% block content%}
+<h2>Invite another user to be a moderator of {{ jaryanak }}</h2>
+
+{% ifequal remaining_invitations_for_jaryanak 0%}
+	<p>{% trans "All possible invitations has been sent for this jaryanak." %}</p>
+{% else %}
+	<p><b>Left invitations: </b> #{{ remaining_invitations_for_jaryanak }}
+
+<form action="#" method="POST">
+	<table>
+	{% csrf_token %}
+	{{form.as_table}}
+	</table>
+
+<input type="submit" value="{% trans "Send Invitation" %}" />
+</form>
+{% endifequal %}
+
+{% endblock %}
+

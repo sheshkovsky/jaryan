@@ -1,0 +1,17 @@
+{% load flags_tags %}
+
+{% with object|content_type as ctype %}
+
+<form method="post" action="{% url 'report' %}">
+  <a href="{% url 'rules' %}">You may want to read Rules before reporting this.</a><br>
+  {% csrf_token %}
+  {% for id, value in reasons %}
+    <input type="hidden" name="content_type" value="{{ ctype.id }}" />
+    <input type="hidden" name="object_id" value="{{ object.id }}" />
+    <input type="radio" name="reason" value="{{id}}"> {{ value }} </input>
+    <br>
+  {% endfor %}
+  <input type="submit" value="Flag content" />
+</form>
+
+{% endwith %}

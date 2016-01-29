@@ -1,0 +1,14 @@
+{% if jaryanaks.count > 0 %}
+
+	<p> You may be interested in: </p>
+	{% for jaryanak in jaryanaks %}
+		<li><a href="{% url 'jaryanak_detail' pk=jaryanak.id slug=jaryanak.slug %}">{{ jaryanak.name }}</a></li>
+	{% endfor %}
+{% else %}
+	<p>None to show.</p>
+<ul> 
+	{% for j in most_viewed %}
+		<li><a href="#">{{ j }}</a></li>
+	{% endfor %}
+</ul>
+{% endif %}

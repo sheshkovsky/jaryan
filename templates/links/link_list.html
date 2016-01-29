@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+{% load humanize %}
+{% load comments_tags %}
+{% load voting_tags%}
+
+{% block javascript %}
+    <script type="text/javascript" src="{% static 'links/js/vote.js' %}"></script>
+{% endblock %}
+
+{% block content%}
+
+<ul>
+{% for link in object_list %}
+	{% if link.jaryanak in followed_jaryanaks %}
+		{% if not link.nsfw_flag %}
+			{% get_comment_count for link as comment_count %}
+			<li> 
+				<a href="{{ link.url }}">
+						<h3>{{ link.title }}</h3> 
+				</a>
+				<form class="vote" method="POST" model="link" id="{{ link.pk }}" direction="up" action="{% url 'vote' object_id=link.pk direction="up" %}">
+					{% csrf_token %}
+					<button type="submit"> + </button>
+				</form>
+
+				<div>
+					{% score_for_object link as score %} 
+					<p class="{{ link.pk }}">{{ score.score }}</p>
+				</div>
+
+				<form class="vote" method="POST" model="link" id="{{ link.pk }}" direction="down" action="{% url 'vote' object_id=link.pk direction="down" %}">
+					{% csrf_token %}
+					<button type="submit"> - </button>
+				</form>
+				
+				<a href="{% url 'link_detail' pk=link.id slug=link.slug %}">
+					{% if comment_count > 0 %} {{ comment_count }} Comments {% else %} Discuss {% endif %}
+				</a>
+				<p> 
+					Submitted by: <a href="{% url 'profile' slug=link.submitter %}">
+					{% if link.submitter.userprofile.picture %}
+			  			<img src="{{ MEDIA_URL }}{{ link.submitter.userprofile.picture.url_15x15 }}"></img><b> {{ link.submitter}}</b></a>
+					{% else %}
+			 			<img src="../../media/images/profile_pictures/default.15x15.jpg"></img><b> {{ link.submitter }}</b></a>
+					 	{% endif %}
+
+					at: {{ link.submit_date | naturaltime }} |
+					{% if link.favicon %}
+						<img src="{{ link.favicon }}" width="20" height="20">
+					{% endif %}
+					Domain: {{ link.domain }} |
+					Jarynak: <a href="{% url 'jaryanak_detail' pk=link.jaryanak.pk slug=link.jaryanak.slug %}">{{ link.jaryanak.name }}</a>
+					{% if not link.language.slug = "farsi" %}
+						| language: {{ link.language }}
+					{% endif %}
+				</p>
+			</li>
+			
+		{% elif link.nsfw_flag and request.user.userprofile.nsfw_flag %}
+			{% get_comment_count for link as comment_count %}
+			<li> 
+				<a href="{{ link.url }}">
+						<h3>{{ link.title }}</h3> 
+				</a>
+				<form class="vote" method="POST" model="link" id="{{ link.pk }}" direction="up" action="{% url 'vote' object_id=link.pk direction="up" %}">
+					{% csrf_token %}
+					<button type="submit"> + </button>
+				</form>
+
+				<div>
+					{% score_for_object link as score %} 
+					<p class="{{ link.pk }}">{{ score.score }}</p>
+				</div>
+
+				<form class="vote" method="POST" model="link" id="{{ link.pk }}" direction="down" action="{% url 'vote' object_id=link.pk direction="down" %}">
+					{% csrf_token %}
+					<button type="submit"> - </button>
+				</form>
+				
+				<a href="{% url 'link_detail' pk=link.id slug=link.slug %}">
+					{% if comment_count > 0 %} {{ comment_count }} Comments {% else %} Discuss {% endif %}
+				</a>
+				<p> 
+					Submitted by: <a href="{% url 'profile' slug=link.submitter %}">
+					{% if link.submitter.userprofile.picture %}
+			  			<img src="{{ MEDIA_URL }}{{ link.submitter.userprofile.picture.url_15x15 }}"></img><b> {{ link.submitter}}</b></a>
+					{% else %}
+			 			<img src="../../media/images/profile_pictures/default.15x15.jpg"></img><b> {{ link.submitter }}</b></a>
+					 	{% endif %}
+
+					at: {{ link.submit_date | naturaltime }} |
+					{% if link.favicon %}
+						<img src="{{ link.favicon }}" width="20" height="20">
+					{% endif %}
+					Domain: {{ link.domain }} |
+					Jarynak: <a href="{% url 'jaryanak_detail' pk=link.jaryanak.pk slug=link.jaryanak.slug %}">{{ link.jaryanak.name }}</a>
+					{% if not link.language.slug = "farsi" %}
+						| language: {{ link.language }}
+					{% endif %}
+				</p>
+			</li>
+		{% endif %}
+
+	{% endif %}
+{% endfor %}
+</ul>
+
+{% endblock %}

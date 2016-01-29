@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block content%}
+
+<h2> Links with {{ object.name }} </h2> <h4>used: {{ tag_count }} times</h4>
+
+{% for link in links_tagged %}
+<ul>
+	<li><a href="{% url 'link_detail' pk=link.id slug=link.slug %}"> {{ link.title }}</a> </li>
+</ul>
+{% endfor %}
+
+
+{% endblock %}

@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+
+{% load votes_tags %}
+{% block content %}
+
+<h2>{{ object.username }}'s Profile</h2>
+<h4>Karma : {{ object.userprofile.karma }}</h4>
+
+{% if object.userprofile.picture %}
+<img src="{{ MEDIA_URL }}{{ object.userprofile.picture.url_150x150 }} "></img>
+{% else %}
+<img src="../../media/images/profile_pictures/default.jpg"></img>
+{% endif %}
+
+{% if object.userprofile.bio %}
+	<div>
+	<b>Bio:</b>
+	{{ object.userprofile.bio }}
+	</div>
+{% endif %}
+
+{% if object == request.user and request.user.is_authenticated %}
+	<p><a href='{% url "edit_profile" %}'>Edit My Profile</a></p>
+	<p><a href='{% url "profile_invites" slug=request.user %}'> Invitations </a></p>
+{% endif %}
+
+<h4> Posts </h4>
+<ul>
+{% for post in posts %}
+	{% if post.is_link %}
+		<li><a href="{{ post.content_object.url }}">{{ post.content_object.title }}</a>
+	{% else %}
+		<li><a href="{% url 'text_detail' pk=post.content_object.id slug=post.content_object.slug %}">{{ post.content_object.title }}</a>
+	{% endif%}
+{% endfor %}
+</ul>
+
+<h4> Commented on </h4>
+{% if comments %}
+<ul>
+	{%for comment in comments %}
+		<li>
+		On {% if comment.content_type.model == "text" %} 
+			<a href="{% url 'text_detail' pk=comment.content_object.id slug=comment.content_object.slug %}">{{ comment.content_object.title }}</a>
+			{% else %}
+			<a href="{% url 'link_detail' pk=comment.content_object.id slug=comment.content_object.slug %}">{{ comment.content_object.title }}</a>
+			{% endif %}
+			 said: <p>{{ comment.comment }}</p>
+		</li>
+	{% endfor %}
+</ul>
+{% else %}
+<p> No comment posted yet!</p>
+{% endif %}
+
+<h4> Voted on </h4>
+<ul>
+{% for vote in votes %}
+	{% if vote.content_type.model == "link" %}
+		<li><a href="{{ vote.object.url }}"> {{ vote.object.title }} </a></li>
+	{% elif vote.content_type.model == "text" %}
+		<li><a href="{% url 'text_detail' pk=vote.object.id slug=vote.object.slug %}"> {{ vote.object.title }}</a></li>
+	{% elif vote.contetnt_type.model == "comment"%}
+		<li><a href="#"> {{ vote.object.title }}</a></li>
+	{% endif %}
+{% endfor %}
+</ul>
+
+<h4> {{ object.username }} is Following </h4>
+{% if following %}
+<ul>
+	{% for jaryanak in following %}
+		<li><a href="{% url 'jaryanak_detail' pk=jaryanak.pk slug=jaryanak.slug %}"> {{ jaryanak.name }} </a></li>
+	{% endfor %}
+</ul>
+{% else %}
+<p> No vote has been submited! </p>
+{% endif %}
+
+
+<h4> {{ object.username }} is Admin of </h4>
+{% if is_admin%}
+<ul>
+
+	{% for jaryanak in is_admin %}
+		<li><a href="{% url 'jaryanak_detail' pk=jaryanak.pk slug=jaryanak.slug %}"> {{ jaryanak.name }} </a></li>
+	{% endfor %}
+</ul>
+{% else %}
+<p> No jaryanak created by this user!</p>
+{% endif %}
+
+<h4>Jaryanaks Moderated by {{ object.username }} </h4>
+{% if moderated %}
+	{% for jaryanak in moderated %}
+  		<a href="{% url 'jaryanak_detail' pk=jaryanak.pk slug=jaryanak.slug %}"> {{ jaryanak.name }} </a> |
+  	{% endfor %}
+{% else %}
+<p> He doesn't moderate any jaryan! </p>
+{% endif %}
+
+{% with object.userprofile.banned_from.all as banned%}
+<h4>Is banned from:</h4>
+{% if banned %}
+	<u>
+	{% for jaryanak in banned %}
+		<li><a href="{% url 'jaryanak_detail' pk=jaryanak.pk slug=jaryanak.slug %}"> {{ jaryanak.name }} </a></li>
+	{% endfor %}
+	</u>
+{% else %}
+<p> hasn't been banned from any Jaryan!</p>
+{% endif %}
+{% endwith %}
+
+
+
+
+{% endblock %}
+

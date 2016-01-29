@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% load taggit_extras %}
+{% load comments_tags %}
+
+
+
+{% block content%}
+
+<ul>
+{% for link in object_list %}
+	{% get_comment_count for link as comment_count %}
+	<li> 
+		<a href="{{ link.url }}">
+				<h3>{{ link.title }}</h3>
+		</a> 
+		<form method="POST" action="{% url 'vote' %}" class="vote_form">
+			{% csrf_token %}
+			<input type="hidden" id="id_link" name="link" class="hidden_id" value="{{ link.pk }}"/>
+			<input type="hidden" id="id_link" name="voter" class="hidden_id" value="{{ user.pk }}"/>
+			<input type="hidden" id="id_link" name="vote_type" class="hidden_id" value="0"/>		
+			<button> + </button>
+			[up votes: {{ link.up_votes}}]
+		</form>
+
+		<form method="POST" action="{% url 'vote' %}" class="vote_form">
+			{% csrf_token %}
+			<input type="hidden" id="id_link" name="link" class="hidden_id" value="{{ link.pk }}"/>
+			<input type="hidden" id="id_link" name="voter" class="hidden_id" value="{{ user.pk }}"/>
+			<input type="hidden" id="id_link" name="vote_type" class="hidden_id" value="1"/>		
+			<button> - </button>
+			[down votes: {{ link.down_votes }}]
+		</form>
+
+		{% for tag in link.tags.all %}
+			<a href="{% url 'tag_detail' slug=tag.slug %}"> {{ tag.name }} </a>, 
+		{% endfor %}
+		<br>
+		<a href="{% url 'link_detail' pk=link.id slug=link.slug %}">
+			{% if comment_count > 0 %} {{ comment_count }} Comments {% else %} Discuss {% endif %}
+		</a>
+		<p>
+			Submitted by: <a href="{% url 'profile' slug=link.submitter %}">
+			<img src="{{ MEDIA_URL }}{{ link.submitter.userprofile.picture.url_15x15 }} ">
+			{{ link.submitter }}</a> 
+			at: {{ link.submit_date | naturaltime }} |
+			{% if link.favicon %}
+				<img src="{{ link.favicon }}" width="20" height="20">
+			{% endif %}
+			Domain: {{ link.domain }} |
+			Category: <a href="{% url 'category_detail' slug=link.category.slug %}">{{ link.category.name }}</a> |
+			{% if not link.language.slug = "farsi" %}
+				language: {{ link.language }}
+			{% endif %}
+		</p>
+	</li>
+	</form>
+{% endfor %}
+</ul>
+
+{% endblock %}

@@ -1,0 +1,74 @@
+{% load staticfiles %}
+
+<html>
+<head>
+  <title>Altio</title>
+  <link rel="stylesheet" type="text/css" href="{% static 'links/css/main.css' %}" />
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js" charset="utf-8"></script>
+  
+  {% block javascript %}{% endblock %}
+</head>
+<body>
+<h1>Altio</h1>
+
+{% block content %}
+
+{% endblock %}
+
+<div id="footer">
+  <p>
+    <a href="{% url 'home' %}">Home</a> |
+    <a href="{% url 'blog' %}">Blog</a> |
+    <a href="{% url 'about' %}">About</a> |
+    <a href="{% url 'jaryanak' %}">Jaryanaks</a> |
+{% if request.user.is_authenticated %}
+    <a href="{% url 'link_create' %}">Submit Link</a> |
+    <a href="{% url 'text_create' %}">Submit Text</a> |
+    <a href="{% url 'jaryanak_create' %}"> New Jaryanak</a> |
+    <a href="{% url 'logout' %}">Logout</a> |
+    <a href="{% url 'profile' slug=request.user.username %}">
+    {% if request.user.userprofile.picture %}
+      <img src="{{ MEDIA_URL }}{{ request.user.userprofile.picture.url_15x15 }}"></img><b> {{ request.user.username }}</b></a>
+    {% else %}
+      <img src="../../media/images/profile_pictures/default.15x15.jpg"></img><b> {{ request.user.username }}</b></a></img>
+    {% endif %}
+    {% if request.user.is_superuser %}
+      <a href="{% url 'all_reports_manager' %}"> Reports</a>
+    {% endif %}
+  {% else %}
+    <a href="{% url 'registration_register' %}">Register</a> |
+    <a href="{% url 'login' %}">Login</a> 
+{% endif %}
+  </p>
+</div>
+</body>
+</html>
+
+<style>
+/* #header {
+    background-color:black;
+    color:white;
+    text-align:center;
+    padding:5px;
+}*/
+#nav {
+    background-color:#eeeeee;
+    min-height:300px;
+    width:300px;
+    float:right;
+    padding:5px; 
+}
+#section {
+    min-width:350px;
+    float:left;
+    padding:10px; 
+}
+#footer {
+    background-color:#eeeeee;
+    color:white;
+    clear:both;
+    text-align:left;
+    padding:5px; 
+}
+</style>
+
