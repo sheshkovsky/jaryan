@@ -1,6 +1,8 @@
 # Jaryan
 "Jaryan" in Persian means stream, story, trend or even thread! Jaryan is a reddit-like social community aims more control and be more scalable and flexible.
 
+Notice: you'll see in codes that "Jaryanak" used to call models. You can imagine that like sub-Jaryan or small Jaryan. 
+
 ## Requirements
 Jaryan is based on Django (a python web framework). You can install requirements using following command:
 ```
